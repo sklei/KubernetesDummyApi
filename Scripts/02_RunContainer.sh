@@ -1,0 +1,1 @@
+docker run -it --rm -p 8081:80 localhost:5000/kubernetesdummyapi

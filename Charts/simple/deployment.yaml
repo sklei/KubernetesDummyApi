@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kubernetesdummyapi-simple
+spec:
+  selector:
+    matchLabels:
+      app: kubernetesdummyapi-simple
+      version: v1
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: kubernetesdummyapi-simple
+        version: v1
+    spec:
+      containers:
+      - name: kubernetesdummyapi-container
+        image: localhost:5000/kubernetesdummyapi:latest
+        ports:
+        - containerPort: 80
+        resources:
+          limits:
+            memory: 512Mi
+            cpu: "1"
+          requests:
+            memory: 256Mi
+            cpu: "0.2"
+        startupProbe:
+          httpGet:
+            path: /health/startup
+            port: 80
+          failureThreshold: 30
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /health/live
+            port: 80
+          initialDelaySeconds: 0
+          periodSeconds: 10
+          timeoutSeconds: 1
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health/ready
+            port: 80
+          successThreshold: 3
+        # Environment variable section
+        env:
+        - name: "ASPNETCORE_ENVIRONMENT"
+          value: "Development"
+        # - name: "ASPNETCORE_FORWARDEDHEADERS_ENABLED"
+        #   value: "true"

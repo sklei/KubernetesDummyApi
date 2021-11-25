@@ -17,6 +17,7 @@ spec:
       containers:
       - name: kubernetesdummyapi-container
         image: localhost:5000/kubernetesdummyapi:latest
+        imagePullPolicy: Always
         ports:
         - containerPort: 80
         resources:
@@ -26,6 +27,9 @@ spec:
           requests:
             memory: 256Mi
             cpu: "0.2"
+        volumeMounts:
+        - name: kda-volume
+          mountPath: /writetohost
         startupProbe:
           httpGet:
             path: /health/startup
@@ -46,8 +50,12 @@ spec:
             port: 80
           successThreshold: 3
         # Environment variable section
-        env:
-        - name: "ASPNETCORE_ENVIRONMENT"
-          value: "Development"
+        # env:
+        # - name: "ASPNETCORE_ENVIRONMENT"
+        #   value: "Development"
         # - name: "ASPNETCORE_FORWARDEDHEADERS_ENABLED"
         #   value: "true"
+      volumes:
+      - name: kda-volume
+        persistentVolumeClaim:
+          claimName: kubernetesdummyapi-pvc
